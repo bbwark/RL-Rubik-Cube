@@ -1,15 +1,12 @@
 import sys
 import os
 
-# Handle imports for both standalone and package execution  
 if __name__ == "__main__":
-    # Standalone execution - add parent directory to path
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sys.path.insert(0, project_root)
     from environment.cube import Cube
     from environment.constants import FRONT, BACK, RIGHT, LEFT, UP, DOWN
 else:
-    # Package execution - use relative imports
     from .cube import Cube
     from .constants import FRONT, BACK, RIGHT, LEFT, UP, DOWN
 
