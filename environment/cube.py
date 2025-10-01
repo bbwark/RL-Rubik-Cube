@@ -141,13 +141,6 @@ class Cube:
             face: the face to rotate (UP, FRONT, LEFT, BACK, RIGHT, DOWN)
             clockwise: True for clockwise rotation, False for counterclockwise
         """
-        face_names = {
-            UP: 'UP', FRONT: 'FRONT', LEFT: 'LEFT',
-            BACK: 'BACK', RIGHT: 'RIGHT', DOWN: 'DOWN'
-        }
-        
-        direction = 'clockwise' if clockwise else 'counterclockwise'
-        print(f"Rotating {face_names.get(face, f'face_{face}')} {direction}")
         
         config = self.ROTATION_CONFIGS[face]
         
