@@ -4,6 +4,8 @@ from .constants import (
     LEFT_COL, RIGHT_COL,
     WHITE, BLUE, RED, GREEN, ORANGE, YELLOW
 )
+import random
+import re
 
 class Cube:
     """A class representing a 3x3 Rubik's Cube using a vector representation."""
@@ -272,5 +274,25 @@ class Cube:
             return True, 1  # Default fallback
 
     def scramble(self, moves=20):
-        #TODO
-        return
+        faces = ['F', 'B', 'R', 'L', 'U', 'D']
+        
+        modifiers = ['', "'", '2']
+        
+        scramble_moves = []
+        last_face = None
+        
+        for _ in range(moves):
+            available_faces = [face for face in faces if face != last_face]
+
+            face = random.choice(available_faces)
+            modifier = random.choice(modifiers)
+
+            move = face + modifier
+            scramble_moves.append(move)
+            
+            last_face = face
+        
+        algorithm = ' '.join(scramble_moves)
+        self.execute_algorithm(algorithm)
+        
+        return algorithm
