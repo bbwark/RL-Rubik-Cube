@@ -289,3 +289,7 @@ class Cube:
         self.execute_algorithm(algorithm)
         
         return algorithm
+    
+    def reset(self):
+        self.state = self._create_solved_state()
+    
