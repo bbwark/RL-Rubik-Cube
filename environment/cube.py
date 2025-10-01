@@ -198,6 +198,79 @@ class Cube:
     def is_solved(self):
         return self.state == self._create_solved_state()
     
+    def execute_algorithm(self, algorithm):
+        """
+        Execute an algorithm of moves on the cube.
+        
+        Args:
+            algorithm: string containing the moves (e.g.: "R U R' U'", "f'ru'b2d'r", "F R U L")
+        """
+        if not algorithm:
+            return
+        
+        face_map = {
+            'F': FRONT, 'B': BACK, 'R': RIGHT,
+            'L': LEFT, 'U': UP, 'D': DOWN
+        }
+        
+        moves = self._parse_moves(algorithm.strip().upper())
+        
+        for move in moves:
+            self._execute_single_move(move, face_map)
+
+    def _parse_moves(self, algorithm):
+        """
+        Parse algorithm string into individual moves.
+        
+        Args:
+            algorithm: sanitized algorithm string
+            
+        Returns:
+            list: list of move strings
+        """
+        pattern = r"[FBLRUD](?:'?2?|2'?)"
+        return re.findall(pattern, algorithm)
+
+    def _execute_single_move(self, move, face_map):
+        """
+        Execute a single move on the cube.
+        
+        Args:
+            move: single move string (e.g., "R", "U'", "F2", "L2'")
+            face_map: dictionary mapping face letters to face constants
+        """
+        if not move or move[0] not in face_map:
+            return
+        
+        face = face_map[move[0]]
+        modifier = move[1:] if len(move) > 1 else ""
+        
+        clockwise, repetitions = self._parse_move_modifier(modifier)
+        
+        for _ in range(repetitions):
+            self.rotate(face, clockwise=clockwise)
+
+    def _parse_move_modifier(self, modifier):
+        """
+        Parse move modifier to determine rotation direction and repetitions.
+        
+        Args:
+            modifier: modifier part of the move (e.g., "", "'", "2", "2'")
+            
+        Returns:
+            tuple: (clockwise: bool, repetitions: int)
+        """
+        if not modifier:
+            return True, 1  # Standard clockwise rotation
+        elif modifier == "'":
+            return False, 1  # Counterclockwise rotation
+        elif modifier == "2":
+            return True, 2  # Double clockwise rotation
+        elif modifier in ["2'", "'2"]:
+            return False, 2  # Double counterclockwise rotation
+        else:
+            return True, 1  # Default fallback
+
     def scramble(self, moves=20):
         #TODO
         return
