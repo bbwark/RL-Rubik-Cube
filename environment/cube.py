@@ -131,28 +131,6 @@ class Cube:
         else:
             self._set_column_values(state, face, index, values)
 
-    def _rotate_face_clockwise(self, state, face):
-        left_col = self._get_column_values(state, face, LEFT_COL)
-        top_row = self._get_row_values(state, face, TOP_ROW)
-        right_col = self._get_column_values(state, face, RIGHT_COL)
-        bottom_row = self._get_row_values(state, face, BOTTOM_ROW)
-        
-        self._set_row_values(state, face, TOP_ROW, left_col[::-1])
-        self._set_column_values(state, face, RIGHT_COL, top_row)
-        self._set_row_values(state, face, BOTTOM_ROW, right_col[::-1])
-        self._set_column_values(state, face, LEFT_COL, bottom_row)
-
-    def _rotate_face_counterclockwise(self, state, face):
-        left_col = self._get_column_values(state, face, LEFT_COL)
-        top_row = self._get_row_values(state, face, TOP_ROW)
-        right_col = self._get_column_values(state, face, RIGHT_COL)
-        bottom_row = self._get_row_values(state, face, BOTTOM_ROW)
-        
-        self._set_row_values(state, face, TOP_ROW, right_col)
-        self._set_column_values(state, face, RIGHT_COL, bottom_row[::-1])
-        self._set_row_values(state, face, BOTTOM_ROW, left_col)
-        self._set_column_values(state, face, LEFT_COL, top_row[::-1])
-
     def rotate(self, face, clockwise=True):
         """
         Rotate a specific face of the cube.
@@ -161,6 +139,14 @@ class Cube:
             face: the face to rotate (UP, FRONT, LEFT, BACK, RIGHT, DOWN)
             clockwise: True for clockwise rotation, False for counterclockwise
         """
+        face_names = {
+            UP: 'UP', FRONT: 'FRONT', LEFT: 'LEFT',
+            BACK: 'BACK', RIGHT: 'RIGHT', DOWN: 'DOWN'
+        }
+        
+        direction = 'clockwise' if clockwise else 'counterclockwise'
+        print(f"Rotating {face_names.get(face, f'face_{face}')} {direction}")
+        
         config = self.ROTATION_CONFIGS[face]
         
         adjacent_values = []
@@ -175,8 +161,6 @@ class Cube:
                 if config['reverse'][i]:
                     values = values[::-1]
                 self._set_values(self.state, face_idx, accessor, index, values)
-            
-            self._rotate_face_clockwise(self.state, config['face'])
         else:
             for i, (face_idx, accessor, index) in enumerate(config['adjacent_cycle']):
                 next_idx = (i + 1) % len(adjacent_values)
@@ -184,9 +168,33 @@ class Cube:
                 if config['reverse'][next_idx]:
                     values = values[::-1]
                 self._set_values(self.state, face_idx, accessor, index, values)
-            
-            self._rotate_face_counterclockwise(self.state, config['face'])
     
+        self._rotate_face_internal(config['face'], clockwise)
+
+    def _rotate_face_internal(self, face, clockwise=True):
+        """
+        Rotate the internal structure of a face.
+        
+        Args:
+            face: face to rotate
+            clockwise: rotation direction
+        """
+        left_col = self._get_column_values(self.state, face, LEFT_COL)
+        top_row = self._get_row_values(self.state, face, TOP_ROW)
+        right_col = self._get_column_values(self.state, face, RIGHT_COL)
+        bottom_row = self._get_row_values(self.state, face, BOTTOM_ROW)
+        
+        if clockwise:
+            self._set_row_values(self.state, face, TOP_ROW, left_col[::-1])
+            self._set_column_values(self.state, face, RIGHT_COL, top_row)
+            self._set_row_values(self.state, face, BOTTOM_ROW, right_col[::-1])
+            self._set_column_values(self.state, face, LEFT_COL, bottom_row)
+        else:
+            self._set_row_values(self.state, face, TOP_ROW, right_col)
+            self._set_column_values(self.state, face, RIGHT_COL, bottom_row[::-1])
+            self._set_row_values(self.state, face, BOTTOM_ROW, left_col)
+            self._set_column_values(self.state, face, LEFT_COL, top_row[::-1])
+
     def is_solved(self):
         return self.state == self._create_solved_state()
     
